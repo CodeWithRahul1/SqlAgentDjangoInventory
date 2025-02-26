@@ -1,2 +1,2 @@
 # SqlAgentDjangoInventory
-Geting data with sql agent for 
+Geting data with sql agent for inventory
