@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        #chat-container { 
+            width: 40%; 
+            background: white; 
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #chat-box { 
+            height: 350px; 
+            overflow-y: auto; 
+            border-bottom: 1px solid #ddd; 
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-msg {
+            align-self: flex-start;
+            background-color: #e0e0e0;
+            color: black;
+            text-align: left;
+            border-bottom-left-radius: 5px;
+        }
+
+        #input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        #send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        #send-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <h2>Chatbot</h2>
+        <div id="chat-box"></div>
+
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Ask something..." />
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function getCSRFToken() {
+            return document.cookie.split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+        }
+
+        $(document).ready(function () {
+            $("#send-btn").click(function () {
+                sendMessage();
+            });
+
+            $("#user-input").keypress(function (event) {
+                if (event.which === 13) { // Enter key
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
+                var userQuery = $("#user-input").val().trim();
+                if (!userQuery) return;
+
+                $("#chat-box").append("<div class='message user-msg'>You: " + userQuery + "</div>");
+                $("#user-input").val("");
+
+                $.ajax({
+                    url: "/inventory/query/",
+                    type: "POST",
+                    contentType: "application/json",
+                    headers: { "X-CSRFToken": getCSRFToken() },
+                    data: JSON.stringify({ query: userQuery }),
+                    success: function (data) {
+                        $("#chat-box").append("<div class='message bot-msg'>Bot: " + data.response + "</div>");
+                        $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
+                    },
+                    error: function () {
+                        $("#chat-box").append("<div class='message bot-msg' style='color: red;'>Error fetching response.</div>");
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
