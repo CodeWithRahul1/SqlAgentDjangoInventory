@@ -31,7 +31,7 @@ inventory_project/
 
 1️⃣ Clone the Repository
 
-git clone https://github.com/your-repo/sql-agent-chatbot.git
+git clone https://github.com/CodeWithRahul1/SqlAgentDjangoInventory.git
 cd sql-agent-chatbot
 
 2️⃣ Set Up Virtual Environment
